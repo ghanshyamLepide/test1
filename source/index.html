@@ -1,15 +1,13 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f4f3ed" />
+    <meta name="theme-color" content="#f5f7fd" />
     <meta name="description" content="Sign in to your Little List workspace." />
     <title>Sign in | Little List</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/auth.css" />
+    <link rel="stylesheet" href="https://lepidus-design-system-button.vercel.app/v1/lepidus.css" />
+    <link rel="stylesheet" href="/auth-lepidus.css" />
   </head>
   <body>
     <div class="auth-shell">
@@ -37,8 +35,8 @@
             <p class="form-intro" id="form-intro">Sign in to pick up where you left off.</p>
 
             <div class="mode-switch" role="group" aria-label="Account access">
-              <button class="mode-button is-active" type="button" data-mode="sign-in" aria-pressed="true">Sign in</button>
-              <button class="mode-button" type="button" data-mode="sign-up" aria-pressed="false">Create account</button>
+              <button class="lp-button lp-button--primary lp-button--md mode-button is-active" type="button" data-mode="sign-in" aria-pressed="true">Sign in</button>
+              <button class="lp-button lp-button--secondary lp-button--md mode-button" type="button" data-mode="sign-up" aria-pressed="false">Create account</button>
             </div>
 
             <div class="config-notice" id="config-notice" role="status" hidden>
@@ -62,7 +60,7 @@
                 </span>
               </label>
               <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
-              <button class="submit-button" id="submit-button" type="submit">Sign in <span aria-hidden="true">&#8594;</span></button>
+              <button class="lp-button lp-button--primary lp-button--md submit-button" id="submit-button" type="submit">Sign in <span aria-hidden="true">&#8594;</span></button>
             </form>
             <p class="privacy-note">Your password is securely managed by Supabase Auth.</p>
           </div>
@@ -72,7 +70,7 @@
             <h2 id="session-name">Welcome.</h2>
             <p class="form-intro" id="session-email"></p>
             <div class="session-note"><span class="session-check" aria-hidden="true">&#10003;</span><span>Your account is ready. Your profile is stored securely in Supabase.</span></div>
-            <button class="submit-button signout-button" id="signout-button" type="button">Sign out <span aria-hidden="true">&#8594;</span></button>
+            <button class="lp-button lp-button--primary lp-button--md submit-button signout-button" id="signout-button" type="button">Sign out <span aria-hidden="true">&#8594;</span></button>
           </div>
 
           <footer class="auth-footer"><span>Little List</span><span>Take today at your pace.</span></footer>

@@ -45,6 +45,8 @@ function setMode(nextMode) {
   document.querySelectorAll('.mode-button').forEach((button) => {
     const active = button.dataset.mode === mode;
     button.classList.toggle('is-active', active);
+    button.classList.toggle('lp-button--primary', active);
+    button.classList.toggle('lp-button--secondary', !active);
     button.setAttribute('aria-pressed', String(active));
   });
 }
