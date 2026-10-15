@@ -1,0 +1,8 @@
+# Supabase setup
+
+1. In the Supabase project, open **SQL Editor**, paste `supabase/schema.sql`, and run it. This creates `public.profiles` with `id` and `name`, enables row-level security, and adds a trigger to create each profile when its auth user signs up.
+2. Copy `.env.example` to `.env.local` and set `VITE_SUPABASE_ANON_KEY` to the project's publishable key (or legacy anon key). The project URL is already filled in.
+3. Run `npm run dev`, choose **Create account**, and register a test/dummy account with a test email, name, and password. If email confirmation is enabled in Supabase Auth, confirm the email before signing in.
+4. In Vercel, add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` under **Project Settings > Environment Variables**, then redeploy.
+
+Never put a Supabase `service_role` or secret key in a `VITE_` variable or browser code. Passwords are stored and verified by Supabase Auth; they are deliberately not columns in `public.profiles`.

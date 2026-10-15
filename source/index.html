@@ -3,66 +3,82 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f2f3ed" />
-    <meta name="description" content="A small, calm place to keep track of today's tasks." />
-    <title>Little List | Make room for today</title>
+    <meta name="theme-color" content="#f4f3ed" />
+    <meta name="description" content="Sign in to your Little List workspace." />
+    <title>Sign in | Little List</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/auth.css" />
   </head>
   <body>
-    <main class="page-shell">
-      <header class="topbar">
+    <div class="auth-shell">
+      <header class="site-header">
         <a class="wordmark" href="/" aria-label="Little List home"><span class="brand-mark" aria-hidden="true"></span> little list</a>
-        <span class="topbar-note">A softer way to get things done</span>
-        <span class="date-label" id="today-date"></span>
+        <span class="secure-label"><span class="secure-dot"></span> PRIVATE WORKSPACE</span>
       </header>
 
-      <section class="workspace" aria-labelledby="page-title">
-        <div class="list-column">
-          <p class="eyebrow"><span class="eyebrow-dot"></span> YOUR DAY, AT YOUR PACE</p>
-          <h1 id="page-title">Make room<br />for <em>today.</em></h1>
-          <p class="intro">A short list is a good place to start. Pick what matters, and let the rest wait.</p>
-
-          <section class="task-panel" aria-label="Today's tasks">
-            <div class="list-heading">
-              <div>
-                <h2>Today's list</h2>
-                <p id="task-summary" aria-live="polite"></p>
-              </div>
-              <span class="progress-ring" id="progress-ring" aria-label="0 percent complete"><span id="progress-value">0%</span></span>
-            </div>
-
-            <form class="add-form" id="task-form">
-              <label class="visually-hidden" for="task-input">Add a task</label>
-              <input id="task-input" name="task" maxlength="100" placeholder="Add one small thing..." autocomplete="off" required />
-              <button class="add-button" type="submit" aria-label="Add task">+</button>
-            </form>
-
-            <ul class="task-list" id="task-list"></ul>
-            <div class="list-footer">
-              <span id="remaining-count"></span>
-              <button class="clear-button" id="clear-completed" type="button">Clear completed</button>
-            </div>
-          </section>
-        </div>
-
-        <aside class="side-column" aria-label="A moment to pause">
-          <div class="photo-panel">
-            <img src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1100&q=85" alt="A sunlit, quiet workspace with a desk and plants" />
-            <div class="photo-caption"><span class="caption-kicker">A LITTLE REMINDER</span><p>Progress is still progress, even when it's quiet.</p></div>
+      <main class="auth-layout">
+        <aside class="welcome-panel" aria-label="Little List">
+          <img class="welcome-image" src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1400&q=85" alt="A quiet sunlit workspace with a desk and plants" />
+          <div class="welcome-shade"></div>
+          <div class="welcome-copy">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> A SMALL SPACE OF YOUR OWN</p>
+            <h1>Your day,<br />with a little<br /><em>more room.</em></h1>
+            <p class="welcome-quote">“Progress is still progress, even when it's quiet.”</p>
           </div>
-          <div class="note-panel">
-            <span class="note-number">01</span>
-            <div><h2>Start where you are.</h2><p>You don't need a perfect plan. Just the next kind thing you can do for future you.</p></div>
-          </div>
-          <p class="made-note"><span aria-hidden="true">✳</span> Made for real-life days</p>
+          <span class="panel-caption">ONE THING AT A TIME</span>
         </aside>
-      </section>
 
-      <footer class="page-footer"><span>One thing at a time.</span><span class="footer-line"></span><span id="done-today"></span></footer>
-    </main>
+        <section class="auth-panel" aria-labelledby="form-title">
+          <div class="auth-content" id="auth-form-view">
+            <p class="section-kicker">YOUR PERSONAL WORKSPACE</p>
+            <h2 id="form-title">Welcome back.</h2>
+            <p class="form-intro" id="form-intro">Sign in to pick up where you left off.</p>
+
+            <div class="mode-switch" role="group" aria-label="Account access">
+              <button class="mode-button is-active" type="button" data-mode="sign-in" aria-pressed="true">Sign in</button>
+              <button class="mode-button" type="button" data-mode="sign-up" aria-pressed="false">Create account</button>
+            </div>
+
+            <div class="config-notice" id="config-notice" role="status" hidden>
+              Add your Supabase URL and anon key to <code>.env.local</code> to enable account access.
+            </div>
+
+            <form class="auth-form" id="auth-form">
+              <label class="field" id="name-field" hidden>
+                <span>Your name</span>
+                <input id="name-input" name="name" type="text" autocomplete="name" maxlength="80" placeholder="How should we call you?" />
+              </label>
+              <label class="field">
+                <span>Email address</span>
+                <input id="email-input" name="email" type="email" autocomplete="email" placeholder="you@example.com" required />
+              </label>
+              <label class="field">
+                <span>Password</span>
+                <span class="password-control">
+                  <input id="password-input" name="password" type="password" autocomplete="current-password" minlength="8" placeholder="At least 8 characters" required />
+                  <button class="password-toggle" id="password-toggle" type="button" aria-label="Show password">Show</button>
+                </span>
+              </label>
+              <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
+              <button class="submit-button" id="submit-button" type="submit">Sign in <span aria-hidden="true">&#8594;</span></button>
+            </form>
+            <p class="privacy-note">Your password is securely managed by Supabase Auth.</p>
+          </div>
+
+          <div class="session-content" id="session-view" hidden>
+            <p class="section-kicker">YOU'RE SIGNED IN</p>
+            <h2 id="session-name">Welcome.</h2>
+            <p class="form-intro" id="session-email"></p>
+            <div class="session-note"><span class="session-check" aria-hidden="true">&#10003;</span><span>Your account is ready. Your profile is stored securely in Supabase.</span></div>
+            <button class="submit-button signout-button" id="signout-button" type="button">Sign out <span aria-hidden="true">&#8594;</span></button>
+          </div>
+
+          <footer class="auth-footer"><span>Little List</span><span>Take today at your pace.</span></footer>
+        </section>
+      </main>
+    </div>
     <script type="module" src="/main.js"></script>
   </body>
 </html>

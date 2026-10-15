@@ -1,109 +1,149 @@
-const storageKey = 'little-list-tasks-v1';
-const starterTasks = [
-  { id: 1, text: 'Take a proper lunch break', done: false },
-  { id: 2, text: "Reply to the one email I've been avoiding", done: false },
-  { id: 3, text: 'Step outside for ten minutes', done: false },
-];
+import { createClient } from '@supabase/supabase-js';
 
-const taskList = document.querySelector('#task-list');
-const taskForm = document.querySelector('#task-form');
-const taskInput = document.querySelector('#task-input');
-const taskSummary = document.querySelector('#task-summary');
-const remainingCount = document.querySelector('#remaining-count');
-const progressRing = document.querySelector('#progress-ring');
-const progressValue = document.querySelector('#progress-value');
-let tasks = readTasks();
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const hasSupabaseConfig = Boolean(
+  supabaseUrl && supabaseAnonKey && !supabaseAnonKey.startsWith('your-'),
+);
+const supabase = hasSupabaseConfig ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
-function readTasks() {
-  try {
-    const savedTasks = JSON.parse(localStorage.getItem(storageKey));
-    return Array.isArray(savedTasks) ? savedTasks : starterTasks;
-  } catch {
-    return starterTasks;
+const form = document.querySelector('#auth-form');
+const nameField = document.querySelector('#name-field');
+const nameInput = document.querySelector('#name-input');
+const emailInput = document.querySelector('#email-input');
+const passwordInput = document.querySelector('#password-input');
+const message = document.querySelector('#form-message');
+const submitButton = document.querySelector('#submit-button');
+const formTitle = document.querySelector('#form-title');
+const formIntro = document.querySelector('#form-intro');
+const formView = document.querySelector('#auth-form-view');
+const sessionView = document.querySelector('#session-view');
+const sessionName = document.querySelector('#session-name');
+const sessionEmail = document.querySelector('#session-email');
+let mode = 'sign-in';
+let activeUserId = null;
+
+function setMessage(text, tone = 'error') {
+  message.textContent = text;
+  message.dataset.tone = tone;
+}
+
+function setMode(nextMode) {
+  mode = nextMode;
+  const isSignUp = mode === 'sign-up';
+  nameField.hidden = !isSignUp;
+  nameInput.required = isSignUp;
+  passwordInput.autocomplete = isSignUp ? 'new-password' : 'current-password';
+  formTitle.textContent = isSignUp ? 'Make it yours.' : 'Welcome back.';
+  formIntro.textContent = isSignUp
+    ? 'Create an account for your own little corner.'
+    : 'Sign in to pick up where you left off.';
+  submitButton.firstChild.textContent = isSignUp ? 'Create account ' : 'Sign in ';
+  message.textContent = '';
+  delete message.dataset.tone;
+
+  document.querySelectorAll('.mode-button').forEach((button) => {
+    const active = button.dataset.mode === mode;
+    button.classList.toggle('is-active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+}
+
+async function showUser(user) {
+  activeUserId = user?.id ?? null;
+  formView.hidden = Boolean(user);
+  sessionView.hidden = !user;
+
+  if (!user) return;
+
+  const fallbackName = user.user_metadata?.name || user.email?.split('@')[0] || 'there';
+  sessionName.textContent = `Welcome, ${fallbackName}.`;
+  sessionEmail.textContent = user.email || '';
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('name')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (activeUserId === user.id && !error && data?.name) {
+    sessionName.textContent = `Welcome, ${data.name}.`;
   }
 }
 
-function saveTasks() {
-  localStorage.setItem(storageKey, JSON.stringify(tasks));
-}
+document.querySelectorAll('.mode-button').forEach((button) => {
+  button.addEventListener('click', () => setMode(button.dataset.mode));
+});
 
-function renderTasks() {
-  const completed = tasks.filter((task) => task.done).length;
-  const remaining = tasks.length - completed;
-  const percent = tasks.length ? Math.round((completed / tasks.length) * 100) : 0;
+document.querySelector('#password-toggle').addEventListener('click', (event) => {
+  const button = event.currentTarget;
+  const showPassword = passwordInput.type === 'password';
+  passwordInput.type = showPassword ? 'text' : 'password';
+  button.textContent = showPassword ? 'Hide' : 'Show';
+  button.setAttribute('aria-label', `${showPassword ? 'Hide' : 'Show'} password`);
+});
 
-  taskList.replaceChildren();
-  if (tasks.length === 0) {
-    const emptyState = document.createElement('li');
-    emptyState.className = 'empty-state';
-    emptyState.textContent = 'Your list is clear. Enjoy the breathing room.';
-    taskList.append(emptyState);
-  }
-
-  for (const task of tasks) {
-    const item = document.createElement('li');
-    item.className = `task-item${task.done ? ' is-done' : ''}`;
-
-    const toggle = document.createElement('button');
-    toggle.className = 'task-toggle';
-    toggle.type = 'button';
-    toggle.setAttribute('role', 'checkbox');
-    toggle.setAttribute('aria-checked', String(task.done));
-    toggle.setAttribute('aria-label', `${task.done ? 'Mark incomplete' : 'Complete'}: ${task.text}`);
-    toggle.addEventListener('click', () => {
-      task.done = !task.done;
-      saveTasks();
-      renderTasks();
-    });
-
-    const label = document.createElement('span');
-    label.className = 'task-text';
-    label.textContent = task.text;
-
-    const remove = document.createElement('button');
-    remove.className = 'remove-button';
-    remove.type = 'button';
-    remove.textContent = 'Remove';
-    remove.setAttribute('aria-label', `Remove task: ${task.text}`);
-    remove.addEventListener('click', () => {
-      tasks = tasks.filter((entry) => entry.id !== task.id);
-      saveTasks();
-      renderTasks();
-    });
-
-    item.append(toggle, label, remove);
-    taskList.append(item);
-  }
-
-  taskSummary.textContent = tasks.length ? `${completed} of ${tasks.length} done` : 'A fresh page';
-  remainingCount.textContent = remaining === 1 ? '1 thing left' : `${remaining} things left`;
-  progressValue.textContent = `${percent}%`;
-  progressRing.setAttribute('aria-label', `${percent} percent complete`);
-  document.querySelector('#done-today').textContent = `${completed} ${completed === 1 ? 'thing' : 'things'} done today`;
-}
-
-taskForm.addEventListener('submit', (event) => {
+form.addEventListener('submit', async (event) => {
   event.preventDefault();
-  const text = taskInput.value.trim();
-  if (!text) return;
+  if (!supabase) return;
 
-  tasks.push({ id: Date.now(), text, done: false });
-  saveTasks();
-  renderTasks();
-  taskInput.value = '';
-  taskInput.focus();
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+  const isSignUp = mode === 'sign-up';
+  submitButton.disabled = true;
+  submitButton.firstChild.textContent = 'Please wait ';
+  setMessage('');
+
+  try {
+    if (isSignUp) {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { name: nameInput.value.trim() } },
+      });
+      if (error) throw error;
+
+      if (data.session) {
+        setMessage('Your account is ready.', 'success');
+      } else {
+        setMode('sign-in');
+        setMessage('Check your email to confirm your account, then sign in.', 'success');
+      }
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+    }
+  } catch (error) {
+    setMessage(error.message || 'Something went wrong. Please try again.');
+  } finally {
+    submitButton.disabled = false;
+    submitButton.firstChild.textContent = mode === 'sign-up' ? 'Create account ' : 'Sign in ';
+  }
 });
 
-document.querySelector('#clear-completed').addEventListener('click', () => {
-  tasks = tasks.filter((task) => !task.done);
-  saveTasks();
-  renderTasks();
+document.querySelector('#signout-button').addEventListener('click', async () => {
+  const button = document.querySelector('#signout-button');
+  button.disabled = true;
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    sessionEmail.textContent = error.message;
+    button.disabled = false;
+  }
 });
 
-document.querySelector('#today-date').textContent = new Intl.DateTimeFormat(undefined, {
-  weekday: 'short',
-  month: 'short',
-  day: 'numeric',
-}).format(new Date());
+if (!hasSupabaseConfig) {
+  document.querySelector('#config-notice').hidden = false;
+  submitButton.disabled = true;
+} else {
+  supabase.auth.onAuthStateChange((_event, session) => {
+    void showUser(session?.user ?? null);
+  });
 
-renderTasks();
+  supabase.auth.getSession().then(({ data, error }) => {
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+    void showUser(data.session?.user ?? null);
+  });
+}
