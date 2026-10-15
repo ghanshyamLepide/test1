@@ -1,0 +1,23 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "hello world",
+  "homepage": "https://github.com/ghanshyamLepide/test1#readme",
+  "bugs": {
+    "url": "https://github.com/ghanshyamLepide/test1/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ghanshyamLepide/test1.git"
+  },
+  "license": "ISC",
+  "author": "ghanshyam",
+  "type": "commonjs",
+  "main": "helloworld.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
